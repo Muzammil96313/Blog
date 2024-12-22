@@ -196,15 +196,15 @@ const PostList = () => {
                     {/* Post author */}
                     {/* Post author with avatar */}
                     <div className="flex items-center mt-2">
-                      {/* {post.user.avatar ? (
+                      {post.user.avatar ? (
                         <img
-                          src={`https://blog-backend-git-master-pracatices-projects.vercel.app/${post.user.avatar}`} // Use the full URL path for avatar
+                          src={post.user.avatar} // Use the full URL path for avatar
                           alt={`${post.user.name}'s Avatar`}
                           className="w-8 h-8 rounded-full mr-2"
                         />
                       ) : (
                         <div className="w-8 h-8 bg-gray-300 rounded-full mr-2"></div>
-                      )} */}
+                      )}
                       <small className="text-gray-500">
                         By: {post.user.name || "Unknown"}
                       </small>
