@@ -13,7 +13,7 @@ const Signup = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "https://blog-backend-git-master-pracatices-projects.vercel.app//api/auth/signup",
+        "https://blog-backend-git-master-pracatices-projects.vercel.app/api/auth/signup",
         {
           name,
           email,

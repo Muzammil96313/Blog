@@ -16,7 +16,7 @@ const Profile = () => {
       try {
         const token = localStorage.getItem("accessToken");
         const response = await axios.get(
-          "https://blog-backend-git-master-pracatices-projects.vercel.app//api/auth/profile",
+          "https://blog-backend-git-master-pracatices-projects.vercel.app/api/auth/profile",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -56,7 +56,7 @@ const Profile = () => {
       }
 
       const response = await axios.put(
-        "https://blog-backend-git-master-pracatices-projects.vercel.app//api/auth/profile",
+        "https://blog-backend-git-master-pracatices-projects.vercel.app/api/auth/profile",
         formDataObj,
         {
           headers: {

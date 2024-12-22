@@ -16,7 +16,7 @@ const PostForm = () => {
       console.log(accessToken); // Log the token to verify it
 
       const response = await axios.post(
-        "https://blog-backend-git-master-pracatices-projects.vercel.app//api/posts",
+        "https://blog-backend-git-master-pracatices-projects.vercel.app/api/posts",
         { title, content },
         {
           headers: { Authorization: `Bearer ${accessToken}` },

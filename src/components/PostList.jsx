@@ -24,7 +24,7 @@ const PostList = () => {
   const fetchPosts = async () => {
     try {
       const response = await axios.get(
-        "https://blog-backend-git-master-pracatices-projects.vercel.app//api/posts"
+        "https://blog-backend-git-master-pracatices-projects.vercel.app/api/posts"
       ); // Replace with your backend URL
       setPosts(response.data);
     } catch (error) {
@@ -35,7 +35,7 @@ const PostList = () => {
     try {
       const token = localStorage.getItem("accessToken");
       const response = await axios.get(
-        "https://blog-backend-git-master-pracatices-projects.vercel.app//api/auth/profile",
+        "https://blog-backend-git-master-pracatices-projects.vercel.app/api/auth/profile",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -64,7 +64,7 @@ const PostList = () => {
       setLoading(true); // Set loading state
       console.log("Deleting post with ID:", deletePostId); // Debugging
       await axios.delete(
-        `https://blog-backend-git-master-pracatices-projects.vercel.app//api/posts/${deletePostId}`,
+        `https://blog-backend-git-master-pracatices-projects.vercel.app/api/posts/${deletePostId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -88,7 +88,7 @@ const PostList = () => {
       }
 
       await axios.put(
-        `https://blog-backend-git-master-pracatices-projects.vercel.app//api/posts/${postId}/like`,
+        `https://blog-backend-git-master-pracatices-projects.vercel.app/api/posts/${postId}/like`,
         {},
         { headers: { Authorization: `Bearer ${token}` } } // Include token in headers
       );

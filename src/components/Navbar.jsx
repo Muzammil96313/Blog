@@ -23,7 +23,7 @@ const Navbar = () => {
 
       try {
         const response = await axios.get(
-          "https://blog-backend-git-master-pracatices-projects.vercel.app//api/auth/profile",
+          "https://blog-backend-git-master-pracatices-projects.vercel.app/api/auth/profile",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
