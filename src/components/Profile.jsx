@@ -16,7 +16,7 @@ const Profile = () => {
       try {
         const token = localStorage.getItem("accessToken");
         const response = await axios.get(
-          "http://localhost:5000/api/auth/profile",
+          "https://blog-backend-git-master-pracatices-projects.vercel.app//api/auth/profile",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -56,7 +56,7 @@ const Profile = () => {
       }
 
       const response = await axios.put(
-        "http://localhost:5000/api/auth/profile",
+        "https://blog-backend-git-master-pracatices-projects.vercel.app//api/auth/profile",
         formDataObj,
         {
           headers: {
@@ -85,7 +85,7 @@ const Profile = () => {
             <div className="mb-4">
               {user.avatar ? (
                 <img
-                  src={`http://localhost:5000${user.avatar}`} // Use the full URL path for image
+                  src={`https://blog-backend-git-master-pracatices-projects.vercel.app/${user.avatar}`} // Use the full URL path for image
                   alt="User Avatar"
                   className="w-32 h-32 rounded-full object-cover"
                 />

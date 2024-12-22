@@ -23,7 +23,7 @@ const Navbar = () => {
 
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/auth/profile",
+          "https://blog-backend-git-master-pracatices-projects.vercel.app//api/auth/profile",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -96,7 +96,7 @@ const Navbar = () => {
                   {" "}
                   {user.avatar ? (
                     <img
-                      src={`http://localhost:5000${user.avatar}`} // Replace with the correct URL for your backend
+                      src={`https://blog-backend-git-master-pracatices-projects.vercel.app/${user.avatar}`} // Replace with the correct URL for your backend
                       alt="User Avatar"
                       className="w-10 h-10 rounded-full"
                     />

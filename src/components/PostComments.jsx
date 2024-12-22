@@ -11,7 +11,7 @@ const PostComments = ({ postId, postUserId, currentUserId }) => {
   const fetchComments = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/comments/${postId}`
+        `https://blog-backend-git-master-pracatices-projects.vercel.app//api/comments/${postId}`
       );
       setComments(response.data);
     } catch (error) {
@@ -27,7 +27,7 @@ const PostComments = ({ postId, postUserId, currentUserId }) => {
     try {
       const token = localStorage.getItem("accessToken");
       await axios.put(
-        `http://localhost:5000/api/comments/${commentId}/like`,
+        `https://blog-backend-git-master-pracatices-projects.vercel.app//api/comments/${commentId}/like`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -45,7 +45,7 @@ const PostComments = ({ postId, postUserId, currentUserId }) => {
     try {
       const token = localStorage.getItem("accessToken");
       await axios.put(
-        `http://localhost:5000/api/comments/${commentId}`,
+        `https://blog-backend-git-master-pracatices-projects.vercel.app//api/comments/${commentId}`,
         { content: updatedContent },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -59,9 +59,12 @@ const PostComments = ({ postId, postUserId, currentUserId }) => {
   const handleDeleteComment = async (commentId) => {
     try {
       const token = localStorage.getItem("accessToken");
-      await axios.delete(`http://localhost:5000/api/comments/${commentId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `https://blog-backend-git-master-pracatices-projects.vercel.app//api/comments/${commentId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       fetchComments(); // Refresh comments
     } catch (error) {
       console.error("Error deleting comment:", error);

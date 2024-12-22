@@ -11,7 +11,7 @@ const EditPostForm = ({ post, onCancel, onUpdate, postId }) => {
     try {
       const token = localStorage.getItem("accessToken"); // Retrieve the token
       const response = await axios.put(
-        `http://localhost:5000/api/posts/${postId}`, // Use the correct post ID
+        `https://blog-backend-git-master-pracatices-projects.vercel.app//api/posts/${postId}`, // Use the correct post ID
         { title, content },
         { headers: { Authorization: `Bearer ${token}` } } // Include auth token
       );

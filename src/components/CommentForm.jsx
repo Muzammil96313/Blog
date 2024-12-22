@@ -9,7 +9,7 @@ const CommentForm = ({ postId, fetchComments }) => {
     try {
       const token = localStorage.getItem("accessToken"); // Retrieve token
       await axios.post(
-        `http://localhost:5000/api/comments/${postId}`,
+        `https://blog-backend-git-master-pracatices-projects.vercel.app//api/comments/${postId}`,
         { content },
         { headers: { Authorization: `Bearer ${token}` } }
       );

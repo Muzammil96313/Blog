@@ -23,7 +23,9 @@ const PostList = () => {
   // Function to fetch posts from the backend
   const fetchPosts = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/posts"); // Replace with your backend URL
+      const response = await axios.get(
+        "https://blog-backend-git-master-pracatices-projects.vercel.app//api/posts"
+      ); // Replace with your backend URL
       setPosts(response.data);
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -33,7 +35,7 @@ const PostList = () => {
     try {
       const token = localStorage.getItem("accessToken");
       const response = await axios.get(
-        "http://localhost:5000/api/auth/profile",
+        "https://blog-backend-git-master-pracatices-projects.vercel.app//api/auth/profile",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -61,9 +63,12 @@ const PostList = () => {
       const token = localStorage.getItem("accessToken"); // Retrieve token
       setLoading(true); // Set loading state
       console.log("Deleting post with ID:", deletePostId); // Debugging
-      await axios.delete(`http://localhost:5000/api/posts/${deletePostId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `https://blog-backend-git-master-pracatices-projects.vercel.app//api/posts/${deletePostId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       fetchPosts(); // Refresh the post list
       setShowModal(false); // Close the modal
     } catch (error) {
@@ -83,7 +88,7 @@ const PostList = () => {
       }
 
       await axios.put(
-        `http://localhost:5000/api/posts/${postId}/like`,
+        `https://blog-backend-git-master-pracatices-projects.vercel.app//api/posts/${postId}/like`,
         {},
         { headers: { Authorization: `Bearer ${token}` } } // Include token in headers
       );
@@ -184,7 +189,7 @@ const PostList = () => {
                     <div className="flex items-center mt-2">
                       {post.user.avatar ? (
                         <img
-                          src={`http://localhost:5000${post.user.avatar}`} // Use the full URL path for avatar
+                          src={`https://blog-backend-git-master-pracatices-projects.vercel.app/${post.user.avatar}`} // Use the full URL path for avatar
                           alt={`${post.user.name}'s Avatar`}
                           className="w-8 h-8 rounded-full mr-2"
                         />
