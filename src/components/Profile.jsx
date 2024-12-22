@@ -91,13 +91,10 @@ const Profile = () => {
                 />
               ) : (
                 <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center">
-                  <label className="cursor-pointer text-blue-500 underline">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarChange}
-                      className="hidden"
-                    />
+                  <label
+                    className="cursor-pointer text-blue-500 underline"
+                    onClick={() => setEditing(true)}
+                  >
                     Upload Avatar
                   </label>
                 </div>
