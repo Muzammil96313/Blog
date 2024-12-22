@@ -6,9 +6,12 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [isLogin, setIsLogin] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
+    if (isLogin) return;
+    setIsLogin(true);
     e.preventDefault();
     try {
       const response = await axios.post(
@@ -35,6 +38,8 @@ const Login = () => {
       setTimeout(() => navigate("/"), 2000);
     } catch (error) {
       setMessage(error.response?.data?.error || "Error logging in");
+    } finally {
+      setIsLogin(false);
     }
   };
 
@@ -58,6 +63,7 @@ const Login = () => {
               name="email"
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="on"
             />
             <label className="mb-2" htmlFor="password">
               Enter Your Password:
@@ -70,12 +76,13 @@ const Login = () => {
               name="password"
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="on"
             />
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 text-xl font-bold"
               type="submit"
             >
-              Log In
+              {isLogin ? "loading..." : "Login"}
             </button>
           </form>
           {message && <p>{message}</p>}

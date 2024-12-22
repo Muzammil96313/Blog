@@ -7,9 +7,12 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
+    if (isSignUp) return;
+    setIsSignUp(true);
     e.preventDefault();
     try {
       const response = await axios.post(
@@ -24,6 +27,8 @@ const Signup = () => {
       setTimeout(() => navigate("/login"), 2000); // Redirect to login after 2 seconds
     } catch (error) {
       setMessage(error.response.data.error || "Error signing up");
+    } finally {
+      setIsSignUp(false);
     }
   };
 
@@ -74,7 +79,7 @@ const Signup = () => {
               className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 text-xl font-bold"
               type="submit"
             >
-              Sign Up
+              {isSignUp ? "Loading..." : "Sign Up"}
             </button>
           </form>
           {message && <p>{message}</p>}

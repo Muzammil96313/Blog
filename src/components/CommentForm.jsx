@@ -3,8 +3,11 @@ import axios from "axios";
 
 const CommentForm = ({ postId, fetchComments }) => {
   const [content, setContent] = useState("");
+  const [isCommentButtonDisabled, setIsCommentButtonDisabled] = useState(null); // Disa
 
   const handleSubmit = async (e) => {
+    if (isCommentButtonDisabled) return; // Prevent multiple clicks
+    setIsCommentButtonDisabled(true); // Disable button
     e.preventDefault();
     try {
       const token = localStorage.getItem("accessToken"); // Retrieve token
@@ -17,6 +20,8 @@ const CommentForm = ({ postId, fetchComments }) => {
       fetchComments(); // Refresh comments after adding
     } catch (error) {
       console.error("Error adding comment:", error);
+    } finally {
+      setIsCommentButtonDisabled(false); // Re-enable button
     }
   };
 
@@ -32,8 +37,9 @@ const CommentForm = ({ postId, fetchComments }) => {
       <button
         type="submit"
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
+        disabled={isCommentButtonDisabled}
       >
-        Comment
+        {isCommentButtonDisabled ? "Adding..." : "Add Comment"}
       </button>
     </form>
   );

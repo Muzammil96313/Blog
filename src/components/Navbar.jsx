@@ -94,7 +94,7 @@ const Navbar = () => {
 
                 <div className="flex items-center gap-2">
                   {" "}
-                  {user.avatar ? (
+                  {/* {user.avatar ? (
                     <img
                       src={`https://blog-backend-git-master-pracatices-projects.vercel.app/${user.avatar}`} // Replace with the correct URL for your backend
                       alt="User Avatar"
@@ -102,7 +102,7 @@ const Navbar = () => {
                     />
                   ) : (
                     <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-                  )}
+                  )} */}
                   <NavLink
                     to="/profile"
                     className={({ isActive }) =>

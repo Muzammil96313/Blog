@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const PostForm = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false); // Added loading state
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,6 +29,9 @@ const PostForm = () => {
       setMessage("Post created successfully!");
       setTitle("");
       setContent("");
+      setTimeout(() => {
+        navigate("/");
+      }, 1000); // Redirect to home page after successful post creation
     } catch (error) {
       if (error.response?.status === 401) {
         setMessage("Unauthorized! Please login.");

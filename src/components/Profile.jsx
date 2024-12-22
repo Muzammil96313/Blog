@@ -82,10 +82,10 @@ const Profile = () => {
         {!editing ? (
           <div>
             {/* Display avatar */}
-            <div className="mb-4">
+            {/* <div className="mb-4">
               {user.avatar ? (
                 <img
-                  src={`https://blog-backend-git-master-pracatices-projects.vercel.app/${user.avatar}`} // Use the full URL path for image
+                  // src={`https://blog-backend-git-master-pracatices-projects.vercel.app/${user.avatar}`} // Use the full URL path for image
                   alt="User Avatar"
                   className="w-32 h-32 rounded-full object-cover"
                 />
@@ -102,7 +102,7 @@ const Profile = () => {
                   </label>
                 </div>
               )}
-            </div>
+            </div> */}
             <p className="text-xl mb-2">
               <strong>Name:</strong> {user.name}
             </p>
@@ -138,7 +138,7 @@ const Profile = () => {
                 className="border p-2 w-full text-black"
               />
             </div>
-            <div className="mt-4">
+            {/* <div className="mt-4">
               <label>Avatar:</label>
               <input
                 type="file"
@@ -146,7 +146,7 @@ const Profile = () => {
                 onChange={handleAvatarChange}
                 className="border p-2 w-full"
               />
-            </div>
+            </div> */}
             <button
               type="submit"
               className="bg-green-500 text-white py-1 px-3 rounded mt-4"
