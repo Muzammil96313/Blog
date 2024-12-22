@@ -3,6 +3,7 @@ import CommentForm from "./CommentForm";
 import axios from "axios";
 import { FaRegEdit } from "react-icons/fa";
 import { FaTrashCan } from "react-icons/fa6";
+import { AiOutlineLike } from "react-icons/ai";
 
 const PostComments = ({ postId, postUserId, currentUserId }) => {
   const [comments, setComments] = useState([]);
@@ -129,7 +130,10 @@ const PostComments = ({ postId, postUserId, currentUserId }) => {
                           : "text-gray-500"
                       }`}
                     >
-                      Like ({comment.likes.length})
+                      <span className="flex items-center space-x-1">
+                        <AiOutlineLike className="text-2xl" /> (
+                        {comment.likes.length})
+                      </span>
                     </button>
 
                     {isOwner && (
