@@ -62,7 +62,9 @@ const Navbar = () => {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                isActive ? "border-b-2 border-white" : "text-xl font-semibold"
+                isActive
+                  ? "border-b-2 dark:border-white border-black"
+                  : "border-black text-xl font-semibold"
               }
             >
               Home
@@ -70,7 +72,9 @@ const Navbar = () => {
             <NavLink
               to="/login"
               className={({ isActive }) =>
-                isActive ? "border-b-2 border-white" : "text-xl font-semibold"
+                isActive
+                  ? "border-b-2 dark:border-white border-black"
+                  : "border-black text-xl font-semibold"
               }
             >
               Login
@@ -78,7 +82,9 @@ const Navbar = () => {
             <NavLink
               to="/signup"
               className={({ isActive }) =>
-                isActive ? "border-b-2 border-white" : "text-xl font-semibold"
+                isActive
+                  ? "border-b-2 dark:border-white border-black"
+                  : "border-black text-xl font-semibold"
               }
             >
               Signup
@@ -107,8 +113,8 @@ const Navbar = () => {
                     to="/profile"
                     className={({ isActive }) =>
                       isActive
-                        ? "border-b-2 border-white"
-                        : "text-xl font-semibold"
+                        ? "border-b-2 dark:border-white border-black"
+                        : "text-xl font-semibold "
                     }
                   >
                     Profile

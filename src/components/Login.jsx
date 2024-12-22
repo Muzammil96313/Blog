@@ -27,8 +27,8 @@ const Login = () => {
 
       // Decode the accessToken
       const decodedToken = JSON.parse(atob(accessToken.split(".")[1]));
-      console.log("Decoded Token:", decodedToken); // Log the decoded payload
-      console.log("User ID from Token:", decodedToken.id);
+      // console.log("Decoded Token:", decodedToken); // Log the decoded payload
+      // console.log("User ID from Token:", decodedToken.id);
 
       // Store tokens in localStorage
       localStorage.setItem("accessToken", accessToken);
@@ -63,7 +63,7 @@ const Login = () => {
               name="email"
               onChange={(e) => setEmail(e.target.value)}
               required
-              autoComplete="on"
+              autoComplete="email"
             />
             <label className="mb-2" htmlFor="password">
               Enter Your Password:
@@ -76,7 +76,7 @@ const Login = () => {
               name="password"
               onChange={(e) => setPassword(e.target.value)}
               required
-              autoComplete="on"
+              autoComplete="current-password"
             />
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 text-xl font-bold"

@@ -52,6 +52,7 @@ const Signup = () => {
               name="name"
               onChange={(e) => setName(e.target.value)}
               required
+              autoComplete="name"
             />
             <label className="mb-2" htmlFor="email">
               Enter Your Email:
@@ -63,6 +64,7 @@ const Signup = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
             />
             <label className="mb-2" htmlFor="password">
               Enter Your Password:
@@ -74,6 +76,7 @@ const Signup = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password"
             />
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 text-xl font-bold"
