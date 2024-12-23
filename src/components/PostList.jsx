@@ -260,45 +260,23 @@ const PostList = () => {
 
 const ExpandableContent = ({ content }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isTruncated, setIsTruncated] = useState(false);
-
-  useEffect(() => {
-    const lineHeight = 24; // Approximate line height in pixels
-    const container = document.createElement("div");
-    container.style.position = "absolute";
-    container.style.visibility = "hidden";
-    container.style.height = "auto";
-    container.style.lineHeight = `${lineHeight}px`;
-    container.style.width = "300px"; // Approximate content width
-    container.style.fontSize = "16px"; // Match your text size
-    container.style.fontFamily = "inherit";
-    container.innerText = content;
-
-    document.body.appendChild(container);
-    const totalHeight = container.offsetHeight;
-    document.body.removeChild(container);
-
-    setIsTruncated(totalHeight > lineHeight * 3);
-  }, [content]);
+  const maxWords = 12; // Maximum number of words to display initially
 
   const toggleContent = () => {
     setIsExpanded(!isExpanded);
   };
 
+  const displayedContent = isExpanded
+    ? content
+    : content.split(" ").slice(0, maxWords).join(" ") +
+      (content.split(" ").length > maxWords ? "..." : "");
+
   return (
     <div>
-      <p
-        className="text-lg dark:text-gray-300 text-gray-500 mb-2"
-        style={{
-          display: "-webkit-box",
-          WebkitBoxOrient: "vertical",
-          WebkitLineClamp: isExpanded ? "none" : 3,
-          overflow: isExpanded ? "visible" : "hidden",
-        }}
-      >
-        {content}
+      <p className="text-lg dark:text-gray-300 text-gray-500 mb-2">
+        {displayedContent}
       </p>
-      {isTruncated && (
+      {content.split(" ").length > maxWords && (
         <button
           onClick={toggleContent}
           className="text-blue-500 font-medium hover:underline"
