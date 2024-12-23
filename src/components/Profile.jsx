@@ -10,6 +10,7 @@ const Profile = () => {
   });
   const [avatar, setAvatar] = useState(null); // State for the avatar file
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -44,6 +45,7 @@ const Profile = () => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const token = localStorage.getItem("accessToken");
 
@@ -70,6 +72,8 @@ const Profile = () => {
       setEditing(false);
     } catch (error) {
       setMessage(error.response?.data?.error || "Error updating profile");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -148,7 +152,7 @@ const Profile = () => {
               type="submit"
               className="bg-green-500 text-white py-1 px-3 rounded mt-4"
             >
-              Save Changes
+              {loading ? "Loading..." : "Save Changes"}
             </button>
           </form>
         )}

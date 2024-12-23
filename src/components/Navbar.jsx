@@ -48,6 +48,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    setUser(null); // Clear user data on logout
     navigate("/login");
   };
 
@@ -69,26 +70,32 @@ const Navbar = () => {
             >
               Home
             </NavLink>
-            <NavLink
-              to="/login"
-              className={({ isActive }) =>
-                isActive
-                  ? "border-b-2 dark:border-white border-black"
-                  : "border-black text-xl font-semibold"
-              }
-            >
-              Login
-            </NavLink>
-            <NavLink
-              to="/signup"
-              className={({ isActive }) =>
-                isActive
-                  ? "border-b-2 dark:border-white border-black"
-                  : "border-black text-xl font-semibold"
-              }
-            >
-              Signup
-            </NavLink>
+            {!user && (
+              <>
+                {" "}
+                <NavLink
+                  to="/login"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "border-b-2 dark:border-white border-black"
+                      : "border-black text-xl font-semibold"
+                  }
+                >
+                  Login
+                </NavLink>
+                <NavLink
+                  to="/signup"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "border-b-2 dark:border-white border-black"
+                      : "border-black text-xl font-semibold"
+                  }
+                >
+                  Signup
+                </NavLink>
+              </>
+            )}
+
             {user && (
               <>
                 <button

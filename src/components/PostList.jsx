@@ -145,9 +145,7 @@ const PostList = () => {
                     <h3 className="text-3xl font-semibold mb-2">
                       {post.title}
                     </h3>
-                    <p className="text-lg dark:text-gray-300 text-gray-500 mb-2">
-                      {post.content}
-                    </p>
+                    <ExpandableContent content={post.content} />
 
                     {/* Buttons for delete, like, edit, and showing likes count */}
                     <div className="flex justify-between items-center mt-4">
@@ -260,4 +258,55 @@ const PostList = () => {
   );
 };
 
+const ExpandableContent = ({ content }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  useEffect(() => {
+    const lineHeight = 24; // Approximate line height in pixels
+    const container = document.createElement("div");
+    container.style.position = "absolute";
+    container.style.visibility = "hidden";
+    container.style.height = "auto";
+    container.style.lineHeight = `${lineHeight}px`;
+    container.style.width = "300px"; // Approximate content width
+    container.style.fontSize = "16px"; // Match your text size
+    container.style.fontFamily = "inherit";
+    container.innerText = content;
+
+    document.body.appendChild(container);
+    const totalHeight = container.offsetHeight;
+    document.body.removeChild(container);
+
+    setIsTruncated(totalHeight > lineHeight * 3);
+  }, [content]);
+
+  const toggleContent = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  return (
+    <div>
+      <p
+        className="text-lg dark:text-gray-300 text-gray-500 mb-2"
+        style={{
+          display: "-webkit-box",
+          WebkitBoxOrient: "vertical",
+          WebkitLineClamp: isExpanded ? "none" : 3,
+          overflow: isExpanded ? "visible" : "hidden",
+        }}
+      >
+        {content}
+      </p>
+      {isTruncated && (
+        <button
+          onClick={toggleContent}
+          className="text-blue-500 font-medium hover:underline"
+        >
+          {isExpanded ? "Show Less" : "Show More"}
+        </button>
+      )}
+    </div>
+  );
+};
 export default PostList;
