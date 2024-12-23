@@ -44,8 +44,9 @@ const Profile = () => {
   };
 
   const handleUpdate = async (e) => {
-    e.preventDefault();
     setLoading(true);
+    e.preventDefault();
+
     try {
       const token = localStorage.getItem("accessToken");
 

@@ -32,7 +32,6 @@ const PostList = () => {
       console.error("Error fetching posts:", error);
     }
   };
-  // const fetchUserDetails = async () => {
   //   try {
   //     const token = localStorage.getItem("accessToken");
   //     const response = await axios.get(
@@ -49,7 +48,6 @@ const PostList = () => {
 
   // Run fetchPosts on component mount
   useEffect(() => {
-    // fetchUserDetails();
     fetchPosts();
   }, []);
 
