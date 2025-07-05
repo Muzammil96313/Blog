@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../firebase"; // Correct firebase path
 
 const EditPostForm = ({ post, onCancel, onUpdate, postId }) => {
   const [title, setTitle] = useState(post.title);
@@ -9,18 +10,18 @@ const EditPostForm = ({ post, onCancel, onUpdate, postId }) => {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem("accessToken"); // Retrieve the token
-      const response = await axios.put(
-        `https://blog-backend-git-master-pracatices-projects.vercel.app/api/posts/${postId}`, // Use the correct post ID
-        { title, content },
-        { headers: { Authorization: `Bearer ${token}` } } // Include auth token
-      );
+      const postRef = doc(db, "posts", postId);
+      await updateDoc(postRef, {
+        title,
+        content,
+        updatedAt: new Date(),
+      });
 
-      console.log("Post updated:", response.data);
-      onUpdate(); // Refresh the post list
-      onCancel(); // Close the edit form
+      console.log("Post updated in Firebase");
+      onUpdate(); // refresh posts
+      onCancel(); // close the form
     } catch (error) {
-      console.error("Error updating post:", error);
+      console.error("Firebase update error:", error);
     }
   };
 

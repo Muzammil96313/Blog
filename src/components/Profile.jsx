@@ -1,78 +1,87 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { auth } from "../../firebase";
+import { updateProfile, onAuthStateChanged } from "firebase/auth";
 
 const Profile = () => {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
   });
-  const [avatar, setAvatar] = useState(null); // State for the avatar file
+  const [avatar, setAvatar] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const token = localStorage.getItem("accessToken");
-        const response = await axios.get(
-          "https://blog-backend-git-master-pracatices-projects.vercel.app/api/auth/profile",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setUser(response.data);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
         setFormData({
-          name: response.data.name,
-          email: response.data.email,
+          name: currentUser.displayName || "",
+          email: currentUser.email || "",
         });
-      } catch (error) {
-        console.error("Error fetching user details:", error);
+      } else {
+        setUser(null);
       }
-    };
+    });
 
-    fetchUserDetails();
+    return () => unsubscribe();
   }, []);
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleAvatarChange = (e) => {
-    setAvatar(e.target.files[0]); // Update the avatar state with the selected file
+    setAvatar(e.target.files[0]);
+  };
+
+  const uploadToCloudinary = async (file) => {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "avatars_preset");
+
+    const res = await fetch(
+      "https://api.cloudinary.com/v1_1/dmbtoka7s/image/upload",
+      {
+        method: "POST",
+        body: data,
+      }
+    );
+
+    const json = await res.json();
+    return json.secure_url;
   };
 
   const handleUpdate = async (e) => {
-    setLoading(true);
     e.preventDefault();
+    setLoading(true);
 
     try {
-      const token = localStorage.getItem("accessToken");
+      let photoURL = user?.photoURL || null;
 
-      // Create a FormData object for sending avatar along with other profile data
-      const formDataObj = new FormData();
-      formDataObj.append("name", formData.name);
-      formDataObj.append("email", formData.email);
       if (avatar) {
-        formDataObj.append("avatar", avatar); // Append avatar if selected
+        photoURL = await uploadToCloudinary(avatar);
       }
 
-      const response = await axios.put(
-        "https://blog-backend-git-master-pracatices-projects.vercel.app/api/auth/profile",
-        formDataObj,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data", // Ensure correct content type
-          },
-        }
-      );
-      setUser(response.data.user);
-      setMessage(response.data.message);
+      await updateProfile(auth.currentUser, {
+        displayName: formData.name,
+        photoURL: photoURL,
+      });
+
+      await auth.currentUser.reload();
+
+      setMessage("Profile updated successfully!");
       setEditing(false);
+      setUser(auth.currentUser);
+      setAvatar(null);
     } catch (error) {
-      setMessage(error.response?.data?.error || "Error updating profile");
+      console.error("Error updating profile:", error);
+      setMessage("Error updating profile.");
     } finally {
       setLoading(false);
     }
@@ -82,15 +91,14 @@ const Profile = () => {
     <div className="dark:bg-gray-900 dark:text-white h-[100vh]">
       <div className="container py-10">
         <h2 className="text-4xl font-bold mb-4">User Profile</h2>
-        {message && <p>{message}</p>}
+        {message && <p className="mb-4">{message}</p>}
 
         {!editing ? (
           <div>
-            {/* Display avatar */}
             <div className="mb-4">
-              {user.avatar ? (
+              {user?.photoURL ? (
                 <img
-                  src={user.avatar} // Use the full URL path for image
+                  src={user.photoURL}
                   alt="User Avatar"
                   className="w-32 h-32 rounded-full object-cover"
                 />
@@ -106,10 +114,10 @@ const Profile = () => {
               )}
             </div>
             <p className="text-xl mb-2">
-              <strong>Name:</strong> {user.name}
+              <strong>Name:</strong> {user?.displayName}
             </p>
             <p className="text-xl mb-2">
-              <strong>Email:</strong> {user.email}
+              <strong>Email:</strong> {user?.email}
             </p>
             <button
               onClick={() => setEditing(true)}
@@ -120,40 +128,42 @@ const Profile = () => {
           </div>
         ) : (
           <form onSubmit={handleUpdate} className="mt-4">
-            <div>
-              <label>Name:</label>
+            <div className="mb-4">
+              <label className="block mb-1">Name:</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
                 className="border p-2 w-full text-black"
+                required
               />
             </div>
-            <div>
-              <label>Email:</label>
+            <div className="mb-4">
+              <label className="block mb-1">Email (cannot change):</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
-                onChange={handleInputChange}
-                className="border p-2 w-full text-black"
+                disabled
+                className="border p-2 w-full text-gray-400 bg-gray-100"
               />
             </div>
-            <div className="mt-4">
-              <label>Avatar:</label>
+            <div className="mb-4">
+              <label className="block mb-1">Upload Avatar:</label>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleAvatarChange}
-                className="border p-2 w-full"
+                className="block mt-2"
               />
             </div>
             <button
               type="submit"
-              className="bg-green-500 text-white py-1 px-3 rounded mt-4"
+              className="bg-green-500 text-white py-1 px-3 rounded"
+              disabled={loading}
             >
-              {loading ? "Loading..." : "Save Changes"}
+              {loading ? "Saving..." : "Save Changes"}
             </button>
           </form>
         )}

@@ -1,45 +1,53 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../../firebase"; // <-- apne firebase config me db bhi export karna hoga
 
 const PostForm = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false); // Added loading state
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading
-    setMessage(""); // Reset message
-    try {
-      const accessToken = localStorage.getItem("accessToken");
-      console.log(accessToken); // Log the token to verify it
+    setLoading(true);
+    setMessage("");
 
-      const response = await axios.post(
-        "https://blog-backend-git-master-pracatices-projects.vercel.app/api/posts",
-        { title, content },
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
+    try {
+      const currentUser = auth.currentUser;
+
+      if (!currentUser) {
+        setMessage("You must be logged in to create a post!");
+        setLoading(false);
+        return;
+      }
+
+      const postData = {
+        title,
+        content,
+        userId: currentUser.uid,
+        authorName: currentUser.displayName || "Anonymous",
+        avatarUrl: currentUser.photoURL || "", // optional
+        createdAt: serverTimestamp(),
+        likes: [],
+      };
+
+      await addDoc(collection(db, "posts"), postData);
 
       setMessage("Post created successfully!");
       setTitle("");
       setContent("");
       setTimeout(() => {
         navigate("/");
-      }, 1000); // Redirect to home page after successful post creation
+      }, 1000);
     } catch (error) {
-      if (error.response?.status === 401) {
-        setMessage("Unauthorized! Please login.");
-      } else {
-        setMessage("Error creating post. Please try again.");
-      }
+      console.error("Error creating post:", error);
+      setMessage("Error creating post. Please try again.");
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
@@ -80,7 +88,7 @@ const PostForm = () => {
                 loading ? "opacity-50" : ""
               }`}
               type="submit"
-              disabled={loading} // Disable button while loading
+              disabled={loading}
             >
               {loading ? "Creating..." : "Create Post"}
             </button>

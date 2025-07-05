@@ -1,27 +1,33 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
-const isTokenValid = () => {
-  const token = localStorage.getItem("accessToken");
-  if (!token) return false;
-
-  try {
-    const decoded = jwtDecode(token); // Decode the JWT
-    const currentTime = Date.now() / 1000; // Current time in seconds
-    return decoded.exp > currentTime; // Check token expiration
-  } catch (error) {
-    console.error("Invalid token:", error.message);
-    return false;
-  }
-};
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useState, useEffect } from "react";
 
 const ProtectedRoute = ({ children }) => {
-  const isValid = isTokenValid();
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  if (!isValid) {
-    // Clear invalid tokens and redirect to login
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+      setLoading(false);
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    // You can show a loading spinner here
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
 

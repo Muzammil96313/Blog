@@ -1,27 +1,32 @@
+// CommentForm.jsx
 import React, { useState } from "react";
-import axios from "axios";
+import { db } from "../../firebase";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
 
 const CommentForm = ({ postId, fetchComments }) => {
   const [content, setContent] = useState("");
-  const [isCommentButtonDisabled, setIsCommentButtonDisabled] = useState(null); // Disa
+  const [isCommentButtonDisabled, setIsCommentButtonDisabled] = useState(false);
 
   const handleSubmit = async (e) => {
-    if (isCommentButtonDisabled) return; // Prevent multiple clicks
-    setIsCommentButtonDisabled(true); // Disable button
     e.preventDefault();
+    if (!content.trim()) return;
+
+    setIsCommentButtonDisabled(true);
     try {
-      const token = localStorage.getItem("accessToken"); // Retrieve token
-      await axios.post(
-        `https://blog-backend-git-master-pracatices-projects.vercel.app/api/comments/${postId}`,
-        { content },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await addDoc(collection(db, "comments"), {
+        postId,
+        content,
+        createdAt: Timestamp.now(),
+        userId: "currentUserId", // Replace this with actual user data
+        userName: "currentUserName", // Replace with logged-in user's name
+        likes: [],
+      });
       setContent("");
-      fetchComments(); // Refresh comments after adding
+      fetchComments(); // Custom fetch function from parent
     } catch (error) {
-      console.error("Error adding comment:", error);
+      console.error("Error adding comment to Firebase:", error);
     } finally {
-      setIsCommentButtonDisabled(false); // Re-enable button
+      setIsCommentButtonDisabled(false);
     }
   };
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase"; // make sure the path is correct
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -10,39 +11,27 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
+    e.preventDefault();
     if (isLogin) return;
     setIsLogin(true);
-    e.preventDefault();
     try {
-      const response = await axios.post(
-        "https://blog-backend-git-master-pracatices-projects.vercel.app/api/auth/login",
-        {
-          email,
-          password,
-        }
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
       );
 
-      const accessToken = response.data.accessToken;
-      const refreshToken = response.data.refreshToken;
+      const user = userCredential.user;
+      console.log("User Info:", user);
 
-      // Decode the accessToken
-      const decodedToken = JSON.parse(atob(accessToken.split(".")[1]));
-      // console.log("Decoded Token:", decodedToken); // Log the decoded payload
-      // console.log("User ID from Token:", decodedToken.id);
-
-      // Store tokens in localStorage
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-
-      setMessage("Login successful! Redirecting to posts...");
+      setMessage("Login successful! Redirecting...");
       setTimeout(() => navigate("/"), 2000);
     } catch (error) {
-      setMessage(error.response?.data?.error || "Error logging in");
+      setMessage(error.message);
     } finally {
       setIsLogin(false);
     }
   };
-
   return (
     <div className="dark:bg-gray-900 dark:text-white h-[100vh]">
       <div className="container dark:text-white text-black">

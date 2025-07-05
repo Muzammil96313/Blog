@@ -1,109 +1,93 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { NavLink } from "react-router-dom";
-import PostComments from "./PostComments";
-import EditPostForm from "./EditPostForm";
 import { FaTrashCan } from "react-icons/fa6";
 import { FaRegEdit } from "react-icons/fa";
 import { AiOutlineDislike, AiOutlineLike } from "react-icons/ai";
+import { getAuth } from "firebase/auth";
+import {
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+} from "firebase/firestore";
+import { db, auth } from "../../firebase"; // <-- apne firebase config ka path sahi se dena
+
+import PostComments from "./PostComments";
+import EditPostForm from "./EditPostForm";
 
 const PostList = () => {
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(false); // State for handling loading indicator
-  const [editingPostId, setEditingPostId] = useState(null); // Track which post is being edited
-  const [deletePostId, setDeletePostId] = useState(null); // For modal visibility
-  const [showModal, setShowModal] = useState(false); // Show/hide modal
-  const [isLikeButtonDisabled, setIsLikeButtonDisabled] = useState(null); // Disable button after click
+  const [loading, setLoading] = useState(false);
+  const [editingPostId, setEditingPostId] = useState(null);
+  const [deletePostId, setDeletePostId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [isLikeButtonDisabled, setIsLikeButtonDisabled] = useState(null);
 
-  let currentUserId = null; // Declare variable globally
-  const token = localStorage.getItem("accessToken");
-  if (token) {
-    const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decode the JWT payload
-    currentUserId = decodedToken.id; // Set the current user ID
-  }
-  // Function to fetch posts from the backend
+  const currentUser = auth.currentUser;
+  const currentUserId = currentUser?.uid || null;
+
   const fetchPosts = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get(
-        "https://blog-backend-git-master-pracatices-projects.vercel.app/api/posts"
-      ); // Replace with your backend URL
-      setPosts(response.data);
+      const querySnapshot = await getDocs(collection(db, "posts"));
+      const postsArray = [];
+      querySnapshot.forEach((docSnap) => {
+        postsArray.push({ ...docSnap.data(), id: docSnap.id });
+      });
+      setPosts(postsArray);
     } catch (error) {
       console.error("Error fetching posts:", error);
+    } finally {
+      setLoading(false);
     }
   };
-  //   try {
-  //     const token = localStorage.getItem("accessToken");
-  //     const response = await axios.get(
-  //       "https://blog-backend-git-master-pracatices-projects.vercel.app/api/auth/profile",
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
-  //     );
-  //     setUser(response.data); // Save user data including avatar
-  //   } catch (error) {
-  //     console.error("Error fetching user details:", error);
-  //   }
-  // };
 
-  // Run fetchPosts on component mount
   useEffect(() => {
     fetchPosts();
   }, []);
 
-  // Function to delete a post
   const handleDelete = async () => {
-    if (!deletePostId) {
-      console.error("Error: No post ID provided for deletion.");
-      return;
-    }
+    if (!deletePostId) return;
 
     try {
-      const token = localStorage.getItem("accessToken"); // Retrieve token
-      setLoading(true); // Set loading state
-      console.log("Deleting post with ID:", deletePostId); // Debugging
-      await axios.delete(
-        `https://blog-backend-git-master-pracatices-projects.vercel.app/api/posts/${deletePostId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      fetchPosts(); // Refresh the post list
-      setShowModal(false); // Close the modal
+      setLoading(true);
+      await deleteDoc(doc(db, "posts", deletePostId));
+      fetchPosts();
+      setShowModal(false);
     } catch (error) {
       console.error("Error deleting post:", error);
     } finally {
-      setLoading(false); // Reset loading state
-      setDeletePostId(null); // Reset the post ID
+      setLoading(false);
+      setDeletePostId(null);
     }
   };
 
-  // Function to like or unlike a post
-  const handleLike = async (postId) => {
-    if (isLikeButtonDisabled) return; // Prevent multiple clicks
-    setIsLikeButtonDisabled(true); // Disable button
+  const handleLike = async (postId, isLiked) => {
+    if (isLikeButtonDisabled) return;
+    setIsLikeButtonDisabled(true);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) throw new Error("Authentication token is missing");
+      const postRef = doc(db, "posts", postId);
 
-      await axios.put(
-        `https://blog-backend-git-master-pracatices-projects.vercel.app/api/posts/${postId}/like`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await updateDoc(postRef, {
+        likes: isLiked ? arrayRemove(currentUserId) : arrayUnion(currentUserId),
+      });
+
       fetchPosts();
     } catch (error) {
-      console.error("Error liking post:", error);
+      console.error("Error updating like:", error);
     } finally {
-      setIsLikeButtonDisabled(false); // Re-enable button after the action
+      setIsLikeButtonDisabled(false);
     }
   };
 
   return (
     <div className="dark:bg-gray-900 dark:text-white min-h-[100vh] max-h-full pb-10">
       <div className="container">
-        {/* Header section with title and create post button */}
+        {/* Header */}
         <div className="flex items-center justify-between mb-4 py-10">
           <h2 className="text-4xl font-bold">All Posts</h2>
           <NavLink
@@ -114,22 +98,20 @@ const PostList = () => {
           </NavLink>
         </div>
 
-        {/* Loading indicator */}
         {loading && <p className="text-center text-blue-500">Processing...</p>}
 
-        {/* List of posts */}
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {posts.map((post, index) => {
-            const isLikedByCurrentUser = post.likes.includes(currentUserId);
+            const isLikedByCurrentUser = post.likes?.includes(currentUserId);
+
             return (
               <li
                 className="py-8 px-4 shadow-lg rounded-lg bg-white text-black dark:bg-gray-700 dark:text-white h-auto"
-                key={post._id}
+                key={post.id}
               >
-                {editingPostId === post._id ? (
-                  // Show Edit Form if the post is being edited
+                {editingPostId === post.id ? (
                   <EditPostForm
-                    postId={post._id}
+                    postId={post.id}
                     post={post}
                     onCancel={() => setEditingPostId(null)}
                     onUpdate={fetchPosts}
@@ -139,22 +121,22 @@ const PostList = () => {
                     <span className="text-xl font-bold text-gray-500">
                       No. {index + 1}
                     </span>
-                    {/* Post title and content */}
                     <h3 className="text-3xl font-semibold mb-2">
                       {post.title}
                     </h3>
                     <ExpandableContent content={post.content} />
 
-                    {/* Buttons for delete, like, edit, and showing likes count */}
                     <div className="flex justify-between items-center mt-4">
                       <button
-                        onClick={() => handleLike(post._id)}
+                        onClick={() =>
+                          handleLike(post.id, isLikedByCurrentUser)
+                        }
                         className={`${
                           isLikedByCurrentUser
                             ? "bg-red-500 hover:bg-red-700"
                             : "bg-green-500 hover:bg-green-700"
                         } text-white font-bold py-1 px-3 rounded`}
-                        disabled={isLikeButtonDisabled} // Disable button during action
+                        disabled={isLikeButtonDisabled}
                       >
                         {isLikedByCurrentUser ? (
                           <AiOutlineDislike className="text-2xl" />
@@ -162,55 +144,53 @@ const PostList = () => {
                           <AiOutlineLike className="text-2xl" />
                         )}
                       </button>
-                      {post.user._id === currentUserId && (
-                        <>
-                          {" "}
-                          <div className="flex items-center gap-6">
-                            <button
-                              onClick={() => {
-                                setDeletePostId(post._id);
-                                setShowModal(true); // Show modal on delete click
-                              }}
-                              className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
-                            >
-                              <FaTrashCan className="text-2xl" />
-                            </button>
-                            <button
-                              onClick={() => setEditingPostId(post._id)}
-                              className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded"
-                            >
-                              <FaRegEdit className="text-2xl" />
-                            </button>
-                          </div>
-                        </>
+
+                      {post.userId === currentUserId && (
+                        <div className="flex items-center gap-6">
+                          <button
+                            onClick={() => {
+                              setDeletePostId(post.id);
+                              setShowModal(true);
+                            }}
+                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
+                          >
+                            <FaTrashCan className="text-2xl" />
+                          </button>
+                          <button
+                            onClick={() => setEditingPostId(post.id)}
+                            className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded"
+                          >
+                            <FaRegEdit className="text-2xl" />
+                          </button>
+                        </div>
                       )}
                     </div>
+
                     <p className="text-gray-500 mt-2">
                       Likes: {post.likes?.length || 0}
                     </p>
 
-                    {/* Post author */}
-                    {/* Post author with avatar */}
+                    {/* Author info */}
                     <div className="flex items-center mt-2">
-                      {post.user.avatar ? (
+                      {post.avatarUrl ? (
                         <img
-                          src={post.user.avatar} // Use the full URL path for avatar
-                          alt={`${post.user.name}'s Avatar`}
+                          src={post.avatarUrl}
+                          alt="Avatar"
                           className="w-8 h-8 rounded-full mr-2"
                         />
                       ) : (
                         <div className="w-8 h-8 bg-gray-300 rounded-full mr-2"></div>
                       )}
                       <small className="text-gray-500">
-                        By: {post.user.name || "Unknown"}
+                        By: {post.authorName || "Unknown"}
                       </small>
                     </div>
 
-                    {/* Post comments */}
+                    {/* Comments */}
                     <div className="mt-4">
                       <PostComments
-                        postId={post._id}
-                        postUserId={post.user._id}
+                        postId={post.id}
+                        postUserId={post.userId}
                         currentUserId={currentUserId}
                       />
                     </div>
@@ -220,6 +200,7 @@ const PostList = () => {
             );
           })}
         </ul>
+
         {showModal && (
           <div
             className="fixed inset-0 flex items-center justify-center bg-white dark:bg-transparent bg-opacity-50 backdrop-blur-sm"
@@ -231,13 +212,13 @@ const PostList = () => {
               </h2>
               <div className="flex justify-end space-x-4">
                 <button
-                  onClick={() => setShowModal(false)} // Cancel action
+                  onClick={() => setShowModal(false)}
                   className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded"
                 >
                   No
                 </button>
                 <button
-                  onClick={handleDelete} // Confirm delete
+                  onClick={handleDelete}
                   className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
                 >
                   Yes
@@ -247,8 +228,7 @@ const PostList = () => {
           </div>
         )}
 
-        {/* Message for empty post list */}
-        {posts.length === 0 && (
+        {posts.length === 0 && !loading && (
           <p className="text-center text-gray-500 mt-4">No posts available.</p>
         )}
       </div>
@@ -258,11 +238,9 @@ const PostList = () => {
 
 const ExpandableContent = ({ content }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const maxWords = 12; // Maximum number of words to display initially
+  const maxWords = 12;
 
-  const toggleContent = () => {
-    setIsExpanded(!isExpanded);
-  };
+  const toggleContent = () => setIsExpanded(!isExpanded);
 
   const displayedContent = isExpanded
     ? content
@@ -285,4 +263,5 @@ const ExpandableContent = ({ content }) => {
     </div>
   );
 };
+
 export default PostList;

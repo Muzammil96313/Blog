@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"; // make sure the path is correct
+import { auth } from "../../firebase"; // make sure the path is correct
 import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
@@ -11,22 +12,23 @@ const Signup = () => {
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
+    e.preventDefault();
     if (isSignUp) return;
     setIsSignUp(true);
-    e.preventDefault();
     try {
-      const response = await axios.post(
-        "https://blog-backend-git-master-pracatices-projects.vercel.app/api/auth/signup",
-        {
-          name,
-          email,
-          password,
-        }
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
       );
+
+      // Update the user's display name
+      await updateProfile(userCredential.user, { displayName: name });
+
       setMessage("Signup successful! Redirecting to login...");
-      setTimeout(() => navigate("/login"), 2000); // Redirect to login after 2 seconds
+      setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
-      setMessage(error.response.data.error || "Error signing up");
+      setMessage(error.message);
     } finally {
       setIsSignUp(false);
     }
